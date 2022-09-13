@@ -1,4 +1,4 @@
-
+[
   {
     "inputs": [{ "internalType": "contract IERC20", "name": "_sushi", "type": "address" }],
     "stateMutability": "nonpayable",
