@@ -1,5 +1,5 @@
 import express from 'express';
-import { fetchRewardersData, StorageHelper } from './src';
+import { ChainId, fetchRewardersData, MINICHEF_ADDRESS, StorageHelper } from './src';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -24,8 +24,14 @@ setTimeout(() => {
   fetchRewardersData(storageHelper);
 }, 900_000);
 
-app.get('/api', authMiddleware, async (req, res) => {
-  res.json(await storageHelper.read());
+app.get('/api/:chainId', authMiddleware, async (req, res) => {
+  const chainId = parseInt(req.params.chainId, 10);
+  const rewarders = await storageHelper.read();
+  if (!rewarders[chainId]) {
+    res.status(404).end();
+    return;
+  }
+  res.json(rewarders[chainId]);
 });
 
 app.listen(port, () => {
