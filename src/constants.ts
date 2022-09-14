@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { gql } from 'graphql-request';
 
 export enum ChainId {
@@ -95,7 +96,7 @@ export const MINICHEF_SUBGRAPH: { [chainId: number]: string } = {
   [ChainId.ETHEREUM]: 'https://api.thegraph.com/subgraphs/name/sushiswap/master-chefv2',
   [ChainId.POLYGON]: 'https://api.thegraph.com/subgraphs/name/sushiswap/matic-minichef',
   [ChainId.GNOSIS]: 'https://api.thegraph.com/subgraphs/name/sushiswap/xdai-minichef',
-  [ChainId.HARMONY]: 'https://sushi.graph.t.hmny.io/subgraphs/name/sushiswap/harmony-minichef',
+  [ChainId.HARMONY]: 'https://api.thegraph.com/subgraphs/name/sushiswap/minichef-harmony',
   [ChainId.ARBITRUM]: 'https://api.thegraph.com/subgraphs/name/sushiswap/arbitrum-minichef',
   [ChainId.CELO]: 'https://api.thegraph.com/subgraphs/name/sushiswap/celo-minichef-v2',
   [ChainId.MOONRIVER]: 'https://api.thegraph.com/subgraphs/name/sushiswap/moonriver-minichef',
@@ -104,6 +105,21 @@ export const MINICHEF_SUBGRAPH: { [chainId: number]: string } = {
   [ChainId.MOONBEAM]: 'https://api.thegraph.com/subgraphs/name/sushiswap/moonbeam-minichef',
   [ChainId.KAVA]: 'https://pvt.graph.kava.io/sushiswap/kava-minichef',
   [ChainId.METIS]: 'https://andromeda.thegraph.metis.io/subgraphs/name/sushiswap/metis-minichef',
+};
+
+export const EXCHANGE_SUBGRAPH: { [ChainId: number]: string } = {
+  [ChainId.ETHEREUM]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-ethereum',
+  [ChainId.POLYGON]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-polygon',
+  [ChainId.GNOSIS]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-gnosis',
+  [ChainId.HARMONY]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-harmony',
+  [ChainId.ARBITRUM]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-arbitrum',
+  [ChainId.CELO]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-celo',
+  [ChainId.MOONRIVER]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-moonriver',
+  [ChainId.FUSE]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-fuse',
+  [ChainId.FANTOM]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-fantom',
+  [ChainId.MOONBEAM]: 'https://api.thegraph.com/subgraphs/name/subgraph-qa/sushiswap-moonbeam',
+  [ChainId.KAVA]: 'https://pvt.graph.kava.io/subgraphs/name/sushiswap/trident-kava',
+  [ChainId.METIS]: 'https://andromeda.thegraph.metis.io/subgraphs/name/sushi-labs/trident-metis',
 };
 
 export const MULTICALL: { [chainId: number]: string } = {
@@ -119,6 +135,84 @@ export const MULTICALL: { [chainId: number]: string } = {
   [ChainId.MOONBEAM]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [ChainId.KAVA]: '0x30A62aA52Fa099C4B227869EB6aeaDEda054d121',
   [ChainId.METIS]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+};
+
+export const MINICHEF_POOLS_QUERY = gql`
+  query queryPools {
+    pools(first: 1000) {
+      id
+      pair
+      rewarder {
+        id
+        rewardToken
+      }
+    }
+  }
+`;
+
+export type MINICHEF_POOLS_RESULT = {
+  id: string;
+  pair: string;
+  rewarder: {
+    id: string;
+    rewardToken: string;
+  };
+};
+
+export const PAIR_INFOS_QUERY = gql`
+  query queryPairInfos($id: ID!) {
+    pair(id: $id) {
+      id
+      liquidityUSD
+      daySnapshots(first: 30, orderBy: date, orderDirection: desc) {
+        id
+        date
+        volumeUSD
+      }
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
+    }
+  }
+`;
+
+export type PAIR_INFOS_RESULT = {
+  id: string;
+  liquidityUSD: string;
+  daySnapshots: {
+    id: string;
+    date: number;
+    volumeUSD: string;
+  }[];
+  token0: {
+    symbol: string;
+  };
+  token1: {
+    symbol: string;
+  };
+};
+
+export type Rewarder = {
+  id: string;
+  masterchefId: number;
+  balance: BigNumber;
+  rewardsDue: BigNumber;
+  rewardToken: {
+    id: string;
+    decimals: number;
+    symbol: string;
+  };
+  rewardPerBlock: BigNumber;
+  rewardPerSecond: BigNumber;
+  pair: {
+    id: string;
+    symbol: string;
+    volumeUSD: number[]; //last 30 days volume
+    reserveUSD: number;
+  };
 };
 
 export const QUERY = gql`
