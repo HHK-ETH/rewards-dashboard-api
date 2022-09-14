@@ -8,10 +8,12 @@ import {
   EXCHANGE_SUBGRAPH,
   PAIR_INFOS_QUERY,
   PAIR_INFOS_RESULT,
+  POOL_USERS_QUERY,
 } from './constants';
 import { ERC20_ABI, MULTICALL_ABI, REWARDER_ABI } from './../imports';
 import request from 'graphql-request';
 import { MINICHEF_SUBGRAPH } from './constants';
+import { AbiCoder } from 'ethers/lib/utils';
 
 async function fetchRewardersTheGraph(chainId: number): Promise<MINICHEF_POOLS_RESULT[]> {
   try {
@@ -106,6 +108,41 @@ async function fetchPairInfos(
     console.log(error);
   }
   return { id: address, symbol: 'UNKNOWN', volumeUSD: [], reserveUSD: 0 };
+}
+
+export async function fetchRewardsDue(chainId: number, rewarderAddress: string, poolId: number): Promise<BigNumber> {
+  const users: { id: string; address: string }[] = [];
+  let lastId = 0;
+  while (true) {
+    const result = await request(MINICHEF_SUBGRAPH[chainId], POOL_USERS_QUERY, {
+      lastId: lastId,
+      poolId: poolId,
+    });
+    users.push(...result.users);
+    if (result.users.length < 1000) {
+      break;
+    }
+    lastId = result.users[999].id;
+  }
+  const provider = new providers.JsonRpcProvider(RPC[chainId]);
+  const rewarderContract = new Contract(rewarderAddress, REWARDER_ABI, provider);
+  const rewarderCalls = users.map((user): Call => {
+    return {
+      target: rewarderAddress,
+      callData: rewarderContract.interface.encodeFunctionData('pendingToken', [poolId, user.address]),
+    };
+  });
+  let rewardsDue = BigNumber.from(0);
+  for (let i = 0; i < rewarderCalls.length; i += 300) {
+    const result = await multicall(chainId, rewarderCalls.slice(i, i + 300), provider);
+    result.map((result) => {
+      if (result.success) {
+        const pending = new AbiCoder().decode(['uint256'], result.returnData)[0];
+        rewardsDue = rewardsDue.add(pending);
+      }
+    });
+  }
+  return rewardsDue;
 }
 
 type Call = {

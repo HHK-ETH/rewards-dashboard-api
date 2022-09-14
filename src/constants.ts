@@ -215,63 +215,11 @@ export type Rewarder = {
   };
 };
 
-export const QUERY = gql`
-  query queryUsers($skip1: Int!, $skip2: Int!, $skip3: Int!, $skip4: Int!, $skip5: Int!, $lastId: ID!) {
-    u1: users(skip: $skip1, first: 1000, where: { rewardDebt_gt: 0, id_gt: $lastId }) {
-      address
-      pool {
-        id
-        rewarder {
-          id
-          rewardToken
-          rewardPerSecond
-        }
-      }
-    }
-    u2: users(skip: $skip2, first: 1000, where: { rewardDebt_gt: 0, id_gt: $lastId }) {
-      address
-      pool {
-        id
-        rewarder {
-          id
-          rewardToken
-          rewardPerSecond
-        }
-      }
-    }
-    u3: users(skip: $skip3, first: 1000, where: { rewardDebt_gt: 0, id_gt: $lastId }) {
-      address
-      pool {
-        id
-        rewarder {
-          id
-          rewardToken
-          rewardPerSecond
-        }
-      }
-    }
-    u4: users(skip: $skip4, first: 1000, where: { rewardDebt_gt: 0, id_gt: $lastId }) {
-      address
-      pool {
-        id
-        rewarder {
-          id
-          rewardToken
-          rewardPerSecond
-        }
-      }
-    }
-    u5: users(skip: $skip5, first: 1000, where: { rewardDebt_gt: 0, id_gt: $lastId }) {
+export const POOL_USERS_QUERY = gql`
+  query queryUsers($lastId: ID!, $poolId: ID!) {
+    users(first: 1000, where: { id_gt: $lastId, pool: $poolId }, orderBy: id, orderDirection: asc) {
       id
       address
-      pool {
-        id
-        rewarder {
-          id
-          rewardToken
-          rewardPerSecond
-        }
-      }
     }
   }
 `;
