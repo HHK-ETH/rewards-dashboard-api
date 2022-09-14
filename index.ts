@@ -1,5 +1,5 @@
 import express from 'express';
-import { fetchPendingSushiRoutine, StorageHelper } from './src';
+import { fetchRewardersData, StorageHelper } from './src';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -21,7 +21,7 @@ const authMiddleware = async function (
 
 const storageHelper = StorageHelper.getInstance();
 setTimeout(() => {
-  fetchPendingSushiRoutine(storageHelper);
+  fetchRewardersData(storageHelper);
 }, 900_000);
 
 app.get('/api', authMiddleware, async (req, res) => {
