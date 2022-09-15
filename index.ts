@@ -28,7 +28,7 @@ setTimeout(() => {
 app.get('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
   const chainId = parseInt(req.params.chainId, 10);
   const rewarderId = req.params.rewarderId;
-  const { rewarders, timestamp } = await storageHelper.read();
+  const rewarders = await storageHelper.read();
   if (!rewarders[chainId]) {
     res.status(404).end();
     return;
@@ -40,13 +40,13 @@ app.get('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
     res.status(404).end();
     return;
   }
-  res.json({ rewarder: rewarder, lastUpdate: timestamp });
+  res.json(rewarder);
 });
 
 app.post('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
   const chainId = parseInt(req.params.chainId, 10);
   const rewarderId = req.params.rewarderId;
-  const { rewarders, timestamp } = await storageHelper.read();
+  const rewarders = await storageHelper.read();
   if (!rewarders[chainId]) {
     res.status(404).end();
     return;
@@ -64,18 +64,18 @@ app.post('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
       rewarders[chainId][index] = updatedRewarder;
     }
   });
-  res.json({ rewarder: updatedRewarder, lastUpdate: new Date().getTime() / 1000 });
+  res.json(updatedRewarder);
   storageHelper.write(rewarders);
 });
 
 app.get('/api/:chainId', authMiddleware, async (req, res) => {
   const chainId = parseInt(req.params.chainId, 10);
-  const { rewarders, timestamp } = await storageHelper.read();
+  const rewarders = await storageHelper.read();
   if (!rewarders[chainId]) {
     res.status(404).end();
     return;
   }
-  res.json({ rewarders: rewarders[chainId], lastUpdate: timestamp });
+  res.json(rewarders[chainId]);
 });
 
 app.listen(port, () => {

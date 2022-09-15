@@ -57,6 +57,7 @@ export async function fetchRewarders(chainId: number): Promise<Rewarder[]> {
             volumeUSD: pair.volumeUSD,
             reserveUSD: pair.reserveUSD,
           },
+          lastUpdated: new Date().getTime() / 1000,
         });
       }
     })

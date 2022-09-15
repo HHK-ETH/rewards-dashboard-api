@@ -13,7 +13,7 @@ export default class StorageHelper {
         const label = id;
         storage[label] = [];
       }
-      fs.writeFile('./src/storage.json', JSON.stringify({ rewarders: storage, timestamp: 0 }), (err) => {
+      fs.writeFile('./src/storage.json', JSON.stringify(storage), (err) => {
         if (!err) return;
         console.log(err);
         throw Error('Impossible to open nor create storage.json.');
@@ -28,13 +28,12 @@ export default class StorageHelper {
     return StorageHelper.instance;
   }
 
-  public async read(): Promise<{ rewarders: { [chainId: number]: Rewarder[] }; timestamp: number }> {
-    const content = await fsPromise.readFile('./src/storage.json', 'utf-8');
-    return JSON.parse(content);
+  public async read(): Promise<{ [chainId: number]: Rewarder[] }> {
+    const rewarders = await fsPromise.readFile('./src/storage.json', 'utf-8');
+    return JSON.parse(rewarders);
   }
 
   public async write(rewarders: { [chainId: number]: Rewarder[] }): Promise<void> {
-    const content = { rewarders: rewarders, timestamp: new Date().getTime() / 1000 };
-    await fsPromise.writeFile('./src/storage.json', JSON.stringify(content));
+    await fsPromise.writeFile('./src/storage.json', JSON.stringify(rewarders));
   }
 }

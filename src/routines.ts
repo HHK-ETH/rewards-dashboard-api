@@ -3,7 +3,7 @@ import StorageHelper from './storageHelper';
 import { fetchRewarders, fetchRewardsDue } from './web3';
 
 export async function fetchRewardersData(storageHelper: StorageHelper): Promise<void> {
-  const { rewarders, timestamp } = await storageHelper.read();
+  const rewarders = await storageHelper.read();
   for (const chainId in MINICHEF_ADDRESS) {
     console.log(chainId + ' start');
     const rewardersData = await fetchRewarders(chainId as any);

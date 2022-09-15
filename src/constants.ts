@@ -213,6 +213,7 @@ export type Rewarder = {
     volumeUSD: number[]; //last 30 days volume
     reserveUSD: number;
   };
+  lastUpdated: number;
 };
 
 export const POOL_USERS_QUERY = gql`
