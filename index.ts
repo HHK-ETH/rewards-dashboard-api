@@ -32,7 +32,7 @@ app.get('/api/:chainId', authMiddleware, async (req, res) => {
     res.status(404).end();
     return;
   }
-  res.json(rewarders[chainId]);
+  res.json({ rewarders: rewarders[chainId], lastUpdate: timestamp });
 });
 
 app.get('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
@@ -50,7 +50,7 @@ app.get('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
     res.status(404).end();
     return;
   }
-  res.json(rewarder);
+  res.json({ rewarder: rewarder, lastUpdate: timestamp });
 });
 
 app.post('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
@@ -74,7 +74,7 @@ app.post('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
       rewarders[chainId][index] = updatedRewarder;
     }
   });
-  res.json(updateRewarder);
+  res.json({ rewarder: updatedRewarder, lastUpdate: new Date().getTime() / 1000 });
   storageHelper.write(rewarders);
 });
 
