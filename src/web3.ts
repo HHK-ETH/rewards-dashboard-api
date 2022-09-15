@@ -66,7 +66,7 @@ export async function fetchRewarders(chainId: number): Promise<Rewarder[]> {
 
 export async function updateRewarder(chainId: number, rewarder: Rewarder): Promise<Rewarder> {
   const provider = new providers.JsonRpcProvider(RPC[chainId]);
-  const rewardToken = await fetchTokenInfos(rewarder.rewardToken.id, rewarder.masterchefId.toString(), provider);
+  const rewardToken = await fetchTokenInfos(rewarder.rewardToken.id, rewarder.id, provider);
   rewarder.balance = rewardToken.rewarderBalance;
   rewarder.rewardToken = rewardToken.tokenInfos;
   rewarder.pair = await fetchPairInfos(rewarder.pair.id, provider);
