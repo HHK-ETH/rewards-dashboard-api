@@ -43,14 +43,15 @@ export async function fetchRewarders(chainId: number): Promise<Rewarder[]> {
         }
         const rewardToken = await fetchTokenInfos(rewardTokenAddress, pool.rewarder.id, provider);
         const pair = await fetchPairInfos(pool.pair, provider);
+        const { rewardPerBlock, rewardPerSecond } = await fetchRewardRate(pool.rewarder.id, provider);
         rewarders.push({
           id: pool.rewarder.id,
           masterchefId: parseFloat(pool.id),
           balance: rewardToken.rewarderBalance,
           rewardsDue: BigNumber.from(0),
           rewardToken: rewardToken.tokenInfos,
-          rewardPerBlock: BigNumber.from(0),
-          rewardPerSecond: BigNumber.from(0),
+          rewardPerBlock: rewardPerBlock,
+          rewardPerSecond: rewardPerSecond,
           pair: {
             id: pool.pair,
             symbol: pair.symbol,
@@ -68,10 +69,37 @@ export async function fetchRewarders(chainId: number): Promise<Rewarder[]> {
 export async function updateRewarder(chainId: number, rewarder: Rewarder): Promise<Rewarder> {
   const provider = new providers.JsonRpcProvider(RPC[chainId]);
   const rewardToken = await fetchTokenInfos(rewarder.rewardToken.id, rewarder.id, provider);
+  const { rewardPerBlock, rewardPerSecond } = await fetchRewardRate(rewarder.id, provider);
   rewarder.balance = rewardToken.rewarderBalance;
   rewarder.rewardToken = rewardToken.tokenInfos;
+  rewarder.rewardPerBlock = rewardPerBlock;
+  rewarder.rewardPerSecond = rewardPerSecond;
   rewarder.pair = await fetchPairInfos(rewarder.pair.id, provider);
   return rewarder;
+}
+
+async function fetchRewardRate(
+  rewarderAddress: string,
+  provider: providers.JsonRpcProvider
+): Promise<{ rewardPerBlock: BigNumber; rewardPerSecond: BigNumber }> {
+  const rewarderContract = new Contract(rewarderAddress, REWARDER_ABI, provider);
+  let rewardPerSecond = BigNumber.from(0);
+  let rewardPerBlock = BigNumber.from(0);
+  try {
+    rewardPerSecond = await rewarderContract.rewardPerSecond();
+    rewardPerBlock = rewardPerSecond.mul(12); //Ethereum pos 12sec per block
+  } catch (error) {
+    console.log(error);
+    try {
+      rewardPerBlock = await rewarderContract.rewardPerBlock();
+      if (rewardPerBlock.gt(0)) {
+        rewardPerSecond = rewardPerBlock.div(12); //Ethereum pos 12sec per block
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  return { rewardPerBlock, rewardPerSecond };
 }
 
 async function fetchTokenInfos(
