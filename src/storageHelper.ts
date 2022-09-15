@@ -28,12 +28,13 @@ export default class StorageHelper {
     return StorageHelper.instance;
   }
 
-  public async read(): Promise<{ [chainId: number]: Rewarder[] }> {
+  public async read(): Promise<{ rewarders: { [chainId: number]: Rewarder[] }; timestamp: number }> {
     const content = await fsPromise.readFile('./src/storage.json', 'utf-8');
     return JSON.parse(content);
   }
 
-  public async write(content: { [chainId: number]: Rewarder[] }): Promise<void> {
+  public async write(rewarders: { [chainId: number]: Rewarder[] }): Promise<void> {
+    const content = { rewarders: rewarders, timestamp: new Date().getTime() / 1000 };
     await fsPromise.writeFile('./src/storage.json', JSON.stringify(content));
   }
 }
