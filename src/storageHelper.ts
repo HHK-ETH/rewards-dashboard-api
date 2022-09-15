@@ -13,7 +13,7 @@ export default class StorageHelper {
         const label = id;
         storage[label] = [];
       }
-      fs.writeFile('./src/storage.json', JSON.stringify(storage), (err) => {
+      fs.writeFile('./src/storage.json', JSON.stringify({ rewarders: storage, timestamp: 0 }), (err) => {
         if (!err) return;
         console.log(err);
         throw Error('Impossible to open nor create storage.json.');
