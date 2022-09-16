@@ -1,5 +1,5 @@
 import express from 'express';
-import { ChainId, fetchRewardersData, MINICHEF_ADDRESS, StorageHelper } from './src';
+import { fetchRewardersData, StorageHelper } from './src';
 import * as dotenv from 'dotenv';
 import { updateRewarder } from './src/web3';
 dotenv.config();
@@ -21,9 +21,9 @@ const authMiddleware = async function (
 };
 
 const storageHelper = StorageHelper.getInstance();
-setTimeout(() => {
-  fetchRewardersData(storageHelper);
-}, 1800_000); //30min
+//setTimeout(() => {
+fetchRewardersData(storageHelper);
+//}, 1800_000); //30min
 
 app.get('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
   const chainId = parseInt(req.params.chainId, 10);

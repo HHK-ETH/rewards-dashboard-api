@@ -172,13 +172,17 @@ export async function fetchRewardsDue(chainId: number, rewarderAddress: string, 
   });
   let rewardsDue = BigNumber.from(0);
   for (let i = 0; i < rewarderCalls.length; i += 300) {
-    const result = await multicall(chainId, rewarderCalls.slice(i, i + 300), provider);
-    result.map((result) => {
-      if (result.success) {
-        const pending = new AbiCoder().decode(['uint256'], result.returnData)[0];
-        rewardsDue = rewardsDue.add(pending);
-      }
-    });
+    try {
+      const result = await multicall(chainId, rewarderCalls.slice(i, i + 300), provider);
+      result.map((result) => {
+        if (result.success) {
+          const pending = new AbiCoder().decode(['uint256'], result.returnData)[0];
+          rewardsDue = rewardsDue.add(pending);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
   return rewardsDue;
 }
