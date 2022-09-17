@@ -58,7 +58,7 @@ export async function fetchRewarders(chainId: number): Promise<Rewarder[]> {
             volumeUSD: pair.volumeUSD,
             reserveUSD: pair.reserveUSD,
           },
-          lastUpdated: new Date().getTime() / 1000,
+          lastUpdated: Date.now() / 1000,
         });
       }
     })
@@ -75,6 +75,7 @@ export async function updateRewarder(chainId: number, rewarder: Rewarder): Promi
   rewarder.rewardPerBlock = rewardPerBlock;
   rewarder.rewardPerSecond = rewardPerSecond;
   rewarder.pair = await fetchPairInfos(rewarder.pair.id, provider);
+  rewarder.lastUpdated = Date.now() / 1000;
   return rewarder;
 }
 
