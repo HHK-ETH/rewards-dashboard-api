@@ -6,6 +6,7 @@ Available at https://rewards.sushibackup.com/api (token needed, dm HHK for one o
 
 ## Routes
 
+### Query all rewarders for a chainId
 GET /browse/{chainId}
 
 ```ts
@@ -31,6 +32,7 @@ return {
 }[];
 ```
 
+### Query a rewarder with a chainId and its address
 GET /browse/{chainId}/{rewarderAddress}
 
 ```ts
@@ -56,6 +58,7 @@ return {
 };
 ```
 
+### Query and update to the lasted data a rewarder with a chainId and its address
 POST /browse/{chainId}/{rewarderAddress}
 
 ```ts
