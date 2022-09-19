@@ -88,16 +88,26 @@ async function fetchRewardRate(
   let rewardPerBlock = BigNumber.from(0);
   try {
     rewardPerSecond = await rewarderContract.rewardPerSecond();
-    rewardPerBlock = rewardPerSecond.mul(12); //Ethereum pos 12sec per block
+    if (provider._network.chainId === 1) {
+      rewardPerBlock = rewardPerSecond.mul(12); //Ethereum pos 12sec per block
+    }
   } catch (error) {
     console.log(error);
     try {
       rewardPerBlock = await rewarderContract.rewardPerBlock();
-      if (rewardPerBlock.gt(0)) {
+      if (rewardPerBlock.gt(0) && provider._network.chainId === 1) {
         rewardPerSecond = rewardPerBlock.div(12); //Ethereum pos 12sec per block
       }
     } catch (error) {
       console.log(error);
+      try {
+        rewardPerBlock = await rewarderContract.tokenPerBlock();
+        if (rewardPerBlock.gt(0) && provider._network.chainId === 1) {
+          rewardPerSecond = rewardPerBlock.div(12); //Ethereum pos 12sec per block
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
   return { rewardPerBlock, rewardPerSecond };
