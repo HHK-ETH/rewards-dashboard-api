@@ -21,11 +21,10 @@ const authMiddleware = async function (
 };
 
 const storageHelper = StorageHelper.getInstance();
-fetchRewardersData(storageHelper).then(() => {
-  setTimeout(() => {
-    fetchRewardersData(storageHelper);
-  }, 3600_000); //60min
-});
+fetchRewardersData(storageHelper);
+setTimeout(() => {
+  fetchRewardersData(storageHelper);
+}, 3600_000); //60min
 
 app.get('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
   const chainId = parseInt(req.params.chainId, 10);
