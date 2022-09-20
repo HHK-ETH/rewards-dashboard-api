@@ -28,14 +28,14 @@ setTimeout(() => {
 
 app.get('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
   const chainId = parseInt(req.params.chainId, 10);
-  const rewarderId = req.params.rewarderId;
+  const rewarderId = parseInt(req.params.rewarderId, 10);
   const rewarders = await storageHelper.read();
   if (!rewarders[chainId]) {
     res.status(404).end();
     return;
   }
   const rewarder = rewarders[chainId].find((rewarder) => {
-    return rewarder.id === rewarderId;
+    return rewarder.masterchefId === rewarderId;
   });
   if (!rewarder) {
     res.status(404).end();
@@ -46,14 +46,14 @@ app.get('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
 
 app.post('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
   const chainId = parseInt(req.params.chainId, 10);
-  const rewarderId = req.params.rewarderId;
+  const rewarderId = parseInt(req.params.rewarderId, 10);
   const rewarders = await storageHelper.read();
   if (!rewarders[chainId]) {
     res.status(404).end();
     return;
   }
   const rewarder = rewarders[chainId].find((rewarder) => {
-    return rewarder.id === rewarderId;
+    return rewarder.masterchefId === rewarderId;
   });
   if (!rewarder) {
     res.status(404).end();
@@ -61,7 +61,7 @@ app.post('/api/:chainId/:rewarderId', authMiddleware, async (req, res) => {
   }
   const updatedRewarder = await updateRewarder(chainId, rewarder);
   rewarders[chainId].map((rewarder, index) => {
-    if (rewarder.id === rewarderId) {
+    if (rewarder.masterchefId === rewarderId) {
       rewarders[chainId][index] = updatedRewarder;
     }
   });
