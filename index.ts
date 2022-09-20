@@ -22,7 +22,7 @@ const authMiddleware = async function (
 
 const storageHelper = StorageHelper.getInstance();
 fetchRewardersData(storageHelper);
-setTimeout(() => {
+setInterval(() => {
   fetchRewardersData(storageHelper);
 }, 3600_000); //60min
 
