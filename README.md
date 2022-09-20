@@ -33,7 +33,7 @@ return {
 ```
 
 ### Query a rewarder with a chainId and its address
-GET /browse/{chainId}/{rewarderAddress}
+GET /browse/{chainId}/{rewarder-masterchef-id}
 
 ```ts
 return {
@@ -59,7 +59,7 @@ return {
 ```
 
 ### Query and update to the lasted data a rewarder with a chainId and its address
-POST /browse/{chainId}/{rewarderAddress}
+POST /browse/{chainId}/{rewarder-masterchef-id}
 
 ```ts
 UpdateRewarder();
