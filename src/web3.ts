@@ -118,19 +118,26 @@ async function fetchTokenInfos(
   rewarderAddress: string,
   provider: providers.JsonRpcProvider
 ): Promise<{ tokenInfos: { id: string; decimals: number; symbol: string }; rewarderBalance: BigNumber }> {
-  if (tokenAddress === '0x0000000000000000000000000000000000000000')
-    return {
-      tokenInfos: { id: '0x0000000000000000000000000000000000000000', decimals: 18, symbol: 'UNKNOWN' },
-      rewarderBalance: BigNumber.from(0),
-    };
-  const token = new Contract(tokenAddress, ERC20_ABI, provider);
+  let decimals = 18;
+  let balance = BigNumber.from(0);
+  let symbol = 'UKNOWN';
+  if (tokenAddress !== '0x0000000000000000000000000000000000000000') {
+    const token = new Contract(tokenAddress, ERC20_ABI, provider);
+    try {
+      decimals = await token.decimals();
+      symbol = await token.symbol();
+      balance = await token.balanceOf(rewarderAddress);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return {
     tokenInfos: {
       id: tokenAddress,
-      decimals: await token.decimals(),
-      symbol: await token.symbol(),
+      decimals: decimals,
+      symbol: symbol,
     },
-    rewarderBalance: await token.balanceOf(rewarderAddress),
+    rewarderBalance: balance,
   };
 }
 
