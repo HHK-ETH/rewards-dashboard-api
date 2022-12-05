@@ -1,6 +1,6 @@
-import { BigNumber } from 'ethers';
 import fs from 'fs';
 import fsPromise from 'fs/promises';
+import { MINICHEF_ADDRESS, Rewarder } from './constants';
 
 export default class StorageHelper {
   private static instance: StorageHelper;
@@ -8,7 +8,11 @@ export default class StorageHelper {
   private constructor() {
     fs.access('./src/storage.json', fs.constants.R_OK, (err) => {
       if (!err) return;
-      const storage: any = { supply: BigNumber.from(0) };
+      const storage: any = {};
+      for (const id in MINICHEF_ADDRESS) {
+        const label = id;
+        storage[label] = [];
+      }
       fs.writeFile('./src/storage.json', JSON.stringify(storage), (err) => {
         if (!err) return;
         console.log(err);
@@ -24,12 +28,12 @@ export default class StorageHelper {
     return StorageHelper.instance;
   }
 
-  public async read(): Promise<{ supply: BigNumber }> {
+  public async read(): Promise<{ [chainId: number]: Rewarder[] }> {
     const rewarders = await fsPromise.readFile('./src/storage.json', 'utf-8');
     return JSON.parse(rewarders);
   }
 
-  public async write(supply: BigNumber): Promise<void> {
-    await fsPromise.writeFile('./src/storage.json', JSON.stringify({ supply: supply }));
+  public async write(rewarders: { [chainId: number]: Rewarder[] }): Promise<void> {
+    await fsPromise.writeFile('./src/storage.json', JSON.stringify(rewarders));
   }
 }
